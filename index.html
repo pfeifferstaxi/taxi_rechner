@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxirechner Landkreis Harz</title>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .info {
+            font-size: 0.9em;
+            color: #555;
+            margin: 20px 0;
+        }
+        .info h2 {
+            text-align: center;
+            color: #d9534f;
+            margin-bottom: 10px;
+        }
+        .tarife {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .tarife h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .tarife p {
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        #results {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #map {
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Taxirechner Landkreis Harz</h1>
+<div class="subheading">Bereitgestellt von Taxi Pfeiffer Blankenburg</div>
+        <div class="info">
+            <h2>Wichtiger Hinweis:</h2>
+            <p>
+                Die errechneten Kilometer und Preise sind nur ca.-Angaben, da die Endpreise aufgrund verschiedener äußerer Einflüsse variieren können. 
+                Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b>
+            </p>
+        </div>
+        <div class="tarife">
+            <h2>Tarifübersicht</h2>
+            <p>Diese Tarife gelten im Landkreis Harz seit April 2022.</p>
+            <ul>
+                <li>Grundgebühr: 3,80 €</li>
+                <li>Kilometer 1 - 5: 3,20 €/km</li>
+                <li>Kilometer 6 - 25: 2,20 €/km</li>
+                <li>Jeder weitere Kilometer: 2,00 €/km</li>
+                <li>Stand-/Wartezeit pro Stunde: 45,00 €</li>
+            </ul>
+        </div>
+        <div class="info">
+            <h2>Anfahrtspauschale:</h2>
+            <p>
+                Bei Fahrten, die <b>nicht in Blankenburg starten</b> und <b>nicht in Blankenburg enden</b> (z. B. ab Wernigerode nach Elbingerode),
+                wird eine Anfahrtspauschale von <b>1,50 €/km</b>, gerechnet ab dem Betriebshof in der Westerhäuser Landstraße 17, 38889 Blankenburg, fällig.
+            </p>
+        </div>
+        <div class="form-group">
+            <label for="start">Startadresse:</label>
+            <input type="text" id="start" placeholder="Startadresse eingeben" required>
+        </div>
+        <div class="form-group">
+            <label for="ziel">Zieladresse:</label>
+            <input type="text" id="ziel" placeholder="Zieladresse eingeben" required>
+        </div>
+        <button onclick="calculateRoute()">Route und Preis berechnen</button>
+        <div id="results"></div>
+        <div id="map"></div>
+        <div class="footer">
+            &copy; Taxi Pfeiffer, Blankenburg 2024
+        </div>
+    </div>
+
+    <script>
+        // TomTom API-Schlüssel
+        const tomtomApiKey = "A2lRfHWgDIYXh9QObZJTvb17TdUG3CNn";
+
+        // Anfahrtspauschale (1,50 € pro Kilometer)
+        const anfahrtspauschalePerKm = 1.50; // 1,50 € pro Kilometer
+
+        // Adresse für die Anfahrtspauschale (Blankenburg)
+        const anfahrtAddress = "Westerhäuser Landstraße 17, 38889 Blankenburg";
+
+        // Initialisiere die Karte
+        const map = L.map('map').setView([51.833, 10.790], 12); // Koordinaten des Landkreises Harz
+        L.tileLayer(`https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=${tomtomApiKey}`, {
+            attribution: '© TomTom'
+        }).addTo(map);
+
+        let routeLayer;
+
+        // Neue Tarife
+        const baseFare = 3.80;  // Grundgebühr
+        const rates = [
+            { maxKm: 5, rate: 3.20 },   // Kilometer 1 bis 5
+            { maxKm: 25, rate: 2.20 },  // Kilometer 6 bis 25
+            { maxKm: Infinity, rate: 2.00 }  // Jeder weitere Kilometer
+        ];
+        const waitFarePerHour = 45.00;  // Stand-/Wartezeit pro Stunde
+
+        async function calculateRoute() {
+            const start = document.getElementById('start').value;
+            const ziel = document.getElementById('ziel').value;
+
+            if (!start || !ziel) {
+                alert("Bitte geben Sie Start- und Zieladresse ein!");
+                return;
+            }
+
+            try {
+                // Geocoding der Startadresse
+                const startResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(start)}.json?key=${tomtomApiKey}`);
+                const startData = await startResponse.json();
+                if (!startData.results || startData.results.length === 0) {
+                    alert("Startadresse nicht gefunden!");
+                    return;
+                }
+                const startCoords = startData.results[0].position;
+
+                // Geocoding der Zieladresse
+                const zielResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(ziel)}.json?key=${tomtomApiKey}`);
+                const zielData = await zielResponse.json();
+                if (!zielData.results || zielData.results.length === 0) {
+                    alert("Zieladresse nicht gefunden!");
+                    return;
+                }
+                const zielCoords = zielData.results[0].position;
+
+                // Geocoding der Anfahrtspauschale-Adresse (Blankenburg)
+                const anfahrtResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(anfahrtAddress)}.json?key=${tomtomApiKey}`);
+                const anfahrtData = await anfahrtResponse.json();
+                if (!anfahrtData.results || anfahrtData.results.length === 0) {
+                    alert("Adresse für die Anfahrtspauschale nicht gefunden!");
+                    return;
+                }
+                const anfahrtCoords = anfahrtData.results[0].position;
+
+                // Überprüfen, ob Start- und Zieladresse in Blankenburg sind
+                const isStartInBlankenburg = start.toLowerCase().includes("blankenburg");
+                const isZielInBlankenburg = ziel.toLowerCase().includes("blankenburg");
+
+                // Berechne die Strecke vom Start zum Ziel
+                const routeResponse2 = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords.lat},${startCoords.lon}:${zielCoords.lat},${zielCoords.lon}/json?key=${tomtomApiKey}`);
+                const routeData2 = await routeResponse2.json();
+                if (!routeData2.routes || routeData2.routes.length === 0) {
+                    alert("Keine Route gefunden!");
+                    return;
+                }
+                const distanceInMeters = routeData2.routes[0].summary.lengthInMeters;
+                const distanceInKm = distanceInMeters / 1000;
+
+                // Kosten berechnen
+                let totalFare = baseFare;
+                let remainingDistance = distanceInKm;
+
+                for (const tier of rates) {
+                    if (remainingDistance > 0) {
+                        const tierDistance = Math.min(remainingDistance, tier.maxKm);
+                        totalFare += tierDistance * tier.rate;
+                        remainingDistance -= tierDistance;
+                    }
+                }
+
+                // Anfahrtspauschale hinzufügen (wenn der Start und Ziel nicht in Blankenburg sind)
+                let anfahrtspauschale = 0;
+                if (!isStartInBlankenburg && !isZielInBlankenburg) {
+                    const routeResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${anfahrtCoords.lat},${anfahrtCoords.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
+                    const routeData = await routeResponse.json();
+                    if (!routeData.routes || routeData.routes.length === 0) {
+                        alert("Keine Anfahrt für die Anfahrtspauschale gefunden!");
+                        return;
+                    }
+                    const anfahrtDistanceInMeters = routeData.routes[0].summary.lengthInMeters;
+                    const anfahrtDistanceInKm = anfahrtDistanceInMeters / 1000;
+                    anfahrtspauschale = anfahrtDistanceInKm * anfahrtspauschalePerKm;
+                    totalFare += anfahrtspauschale;
+                }
+
+                // Ergebnisse anzeigen
+                document.getElementById('results').innerHTML = `
+                    <h3>Ergebnisse</h3>
+                    <p><b>Distanz:</b> ${distanceInKm.toFixed(2)} km</p>
+                    <p><b>Anfahrtspauschale (von Blankenburg):</b> ${anfahrtspauschale.toFixed(2)} €</p>
+                    <p><b>Gesamtpreis:</b> ${totalFare.toFixed(2)} €</p>
+                `;
+
+                // Route auf der Karte anzeigen
+                if (routeLayer) map.removeLayer(routeLayer);
+
+                const points = routeData2.routes[0].legs[0].points.map(point => [point.latitude, point.longitude]);
+                routeLayer = L.polyline(points, { color: 'blue' }).addTo(map);
+
+                map.fitBounds(routeLayer.getBounds());
+            } catch (error) {
+                console.error("Ein Fehler ist aufgetreten:", error);
+                alert("Fehler bei der Berechnung der Route. Bitte versuchen Sie es erneut.");
+            }
+        }
+    </script>
+</body>
+</html>
