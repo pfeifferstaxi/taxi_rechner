@@ -109,6 +109,12 @@ Bei Fahrten, die nicht in Blankenburg beginnen und auch nicht in Blankenburg end
     <label for="dateTime">Datum und Uhrzeit:</label>
     <input type="datetime-local" id="dateTime"placeholder="Optional:Datum und Uhrzeit eingeben">
 </div>
+<style>
+    input::placeholder {
+        color: #888; /* Farbe für Placeholder-Text */
+        font-style: italic; /* Optional */
+    }
+</style>
         <button onclick="calculateRoute()">Route und Preis berechnen</button>
         <div id="results"></div>
         <div id="map" style="width: 100%; height: 400px; margin-top: 20px; border-radius: 8px;"></div>
