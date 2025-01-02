@@ -84,16 +84,17 @@
         <div class="tarife">
             <h2>Tarifübersicht</h2>
             <ul>
-                <li>Grundgebühr: 4,20 €</li>
-                <li>Kilometer 1 - 5: 3,60 €/km</li>
-                <li>Kilometer 6 - 25: 2,60 €/km</li>
-                <li>Jeder weitere Kilometer: 2,40 €/km</li>
-                <li>Stand-/Wartezeit pro Stunde: 45,00 €</li>
+                <li><b>Grundgebühr: 3,80 €</b></li>
+                <li><b>Kilometer 1 - 5: 3,20 €/km</b></li>
+                <li><b>Kilometer 6 - 25: 2,20 €/km</b></li>
+                <li><b>Jeder weitere Kilometer: 2,00 €/km</b></li>
+                <li><b>Stand-/Wartezeit pro Stunde: 45,00 €</b></li>
+<li><b>Nachtzuschlag (22.00 Uhr - 06.00 Uhr): 1,00 €/km</b></li>
             </ul>
 <center><h2>Anfahrtspauschale:</h2></center
     <p>
-        Bei Fahrten, die nicht in Blankenburg starten und nicht in Blankenburg enden (z. B. ab Wernigerode nach Elbingerode), wird eine Anfahrtspauschale 
-        von 2,00 €/km, gerechnet ab dem Betriebshof in der Westerhäuser Landstraße 17, 38889 Blankenburg, fällig.
+Bei Fahrten, die nicht in Blankenburg beginnen und auch nicht in Blankenburg enden (z. B. ab Wernigerode nach Elbingerode), wird ein Entgelt nach Punkt 2 der Tarifordnung des Landkreises Harz fällig. 
+ Wir berechnen eine Gebühr von 1,50 €/km, gerechnet ab dem Betriebshof in der Westerhäuser Landstraße 17, 38889 Blankenburg, fällig.
     </p>
         </div>
         <div class="form-group">
@@ -104,6 +105,10 @@
             <label for="ziel">Zieladresse:</label>
             <input type="text" id="ziel" placeholder="Zieladresse eingeben" required>
         </div>
+<div class="form-group">
+    <label for="dateTime">Datum und Uhrzeit:</label>
+    <input type="datetime-local" id="dateTime"placeholder="Optional:Datum und Uhrzeit eingeben">
+</div>
         <button onclick="calculateRoute()">Route und Preis berechnen</button>
         <div id="results"></div>
         <div id="map" style="width: 100%; height: 400px; margin-top: 20px; border-radius: 8px;"></div>
@@ -123,20 +128,26 @@
                 { maxKm: Infinity, rate: 2.00 }
             ];
 
-           async function calculateRoute() {
+          async function calculateRoute() {
     const start = document.getElementById('start').value;
     const ziel = document.getElementById('ziel').value;
+    const dateTime = document.getElementById('dateTime').value; // Datum/Uhrzeit
 
-    if (!start || !ziel) {
-        alert("Bitte geben Sie Start- und Zieladresse ein!");
+    if (!start || !ziel || !dateTime) {
+        alert("Bitte geben Sie Start-, Zieladresse und Datum/Uhrzeit ein!");
         return;
     }
 
     try {
-        // Betriebshof-Koordinaten
-        const betriebshof = { lat: 51.79162, lon: 10.96156 }; // Westerhäuser Landstraße 17, Blankenburg
+        // Datum/Uhrzeit analysieren
+        const selectedDate = new Date(dateTime);
+        const hour = selectedDate.getHours();
+        const isNightTime = hour >= 22 || hour < 6; // Nachtzeit prüfen
 
-        // Startadresse
+        // Betriebshof-Koordinaten für Anfahrtspauschale
+        const betriebshofCoords = { lat: 51.800, lon: 10.950 }; // Beispiel: Westerhäuser Landstraße 17, Blankenburg
+
+        // Adresskoordinaten abrufen (Start und Ziel)
         const startResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(start)}.json?key=${tomtomApiKey}`);
         const startData = await startResponse.json();
         if (!startData.results || startData.results.length === 0) {
@@ -145,7 +156,6 @@
         }
         const startCoords = startData.results[0].position;
 
-        // Zieladresse
         const zielResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(ziel)}.json?key=${tomtomApiKey}`);
         const zielData = await zielResponse.json();
         if (!zielData.results || zielData.results.length === 0) {
@@ -164,11 +174,14 @@
         const distanceInMeters = routeData.routes[0].summary.lengthInMeters;
         const distanceInKm = distanceInMeters / 1000;
 
-        // Grundpreisberechnung
+        // Berechnung der Tarife mit Nachtzuschlag
         let totalFare = baseFare;
         let remainingDistance = distanceInKm;
+        const adjustedRates = isNightTime
+            ? rates.map(rate => ({ maxKm: rate.maxKm, rate: rate.rate + 1.00 }))
+            : rates;
 
-        for (const tier of rates) {
+        for (const tier of adjustedRates) {
             if (remainingDistance > 0) {
                 const tierDistance = Math.min(remainingDistance, tier.maxKm);
                 totalFare += tierDistance * tier.rate;
@@ -177,35 +190,31 @@
         }
 
         // Anfahrtspauschale berechnen
-        const isStartInBlankenburg = start.toLowerCase().includes("blankenburg");
-        const isZielInBlankenburg = ziel.toLowerCase().includes("blankenburg");
         let anfahrtspauschale = 0;
-
-        if (!isStartInBlankenburg && !isZielInBlankenburg) {
-            const anfahrtResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${betriebshof.lat},${betriebshof.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
+        if (!start.toLowerCase().includes("blankenburg") && !ziel.toLowerCase().includes("blankenburg")) {
+            const anfahrtResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${betriebshofCoords.lat},${betriebshofCoords.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
             const anfahrtData = await anfahrtResponse.json();
             if (anfahrtData.routes && anfahrtData.routes.length > 0) {
                 const anfahrtDistanceInMeters = anfahrtData.routes[0].summary.lengthInMeters;
                 const anfahrtDistanceInKm = anfahrtDistanceInMeters / 1000;
-                anfahrtspauschale = anfahrtDistanceInKm * 2.00;
+                anfahrtspauschale = anfahrtDistanceInKm * 1.50;
+                totalFare += anfahrtspauschale; // Anfahrtspauschale zum Gesamtpreis addieren
             }
         }
 
-        totalFare += anfahrtspauschale;
-
-        // Ergebnisse anzeigen
+        // Ergebnis anzeigen
         document.getElementById('results').innerHTML = `
             <h3>Geschätzter Taxipreis</h3>
             <p><b>Distanz:</b> ${distanceInKm.toFixed(2)} km</p>
+            ${isNightTime ? `<p><b>Nachtzuschlag:</b> 1,00 €/km</p>` : ""}
             ${anfahrtspauschale > 0 ? `<p><b>Anfahrtspauschale:</b> ${anfahrtspauschale.toFixed(2)} €</p>` : ""}
-            <p><b>Preis:</b> ${totalFare.toFixed(2)} €</p>
+            <p><b>Geschätzter Taxipreis:</b> ${totalFare.toFixed(2)} €</p>
         `;
 
         // Route auf der Karte anzeigen
         if (routeLayer) map.removeLayer(routeLayer);
         const points = routeData.routes[0].legs[0].points.map(point => [point.latitude, point.longitude]);
         routeLayer = L.polyline(points, { color: 'blue' }).addTo(map);
-
         map.fitBounds(routeLayer.getBounds());
     } catch (error) {
         console.error("Ein Fehler ist aufgetreten:", error);
