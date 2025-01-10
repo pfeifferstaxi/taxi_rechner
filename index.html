@@ -84,10 +84,10 @@
         <div class="tarife">
             <h2>Tarifübersicht</h2>
             <ul>
-                <li><b>Grundgebühr: 3,80 €</b></li>
-                <li><b>Kilometer 1 - 5: 3,20 €/km</b></li>
-                <li><b>Kilometer 6 - 25: 2,20 €/km</b></li>
-                <li><b>Jeder weitere Kilometer: 2,00 €/km</b></li>
+                <li><b>Grundgebühr: 4,20 €</b></li>
+                <li><b>Kilometer 1 - 5: 3,60 €/km</b></li>
+                <li><b>Kilometer 6 - 25: 2,60 €/km</b></li>
+                <li><b>Jeder weitere Kilometer: 2,40 €/km</b></li>
                 <li><b>Stand-/Wartezeit pro Stunde: 45,00 €</b></li>
 <li><b>Nachtzuschlag (22.00 Uhr - 06.00 Uhr): 1,00 €/km</b></li>
             </ul>
@@ -127,11 +127,11 @@ Bei Fahrten, die nicht in Blankenburg beginnen und auch nicht in Blankenburg end
 
             let routeLayer;
 
-            const baseFare = 3.80;
+            const baseFare = 4.20;
             const rates = [
-                { maxKm: 5, rate: 3.20 },
-                { maxKm: 25, rate: 2.20 },
-                { maxKm: Infinity, rate: 2.00 }
+                { maxKm: 5, rate: 3.60 },
+                { maxKm: 25, rate: 2.60 },
+                { maxKm: Infinity, rate: 2.40 }
             ];
 
           async function calculateRoute() {
