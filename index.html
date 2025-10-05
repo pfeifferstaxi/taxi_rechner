@@ -53,11 +53,11 @@
     #taxirechner button:hover {
       background-color: #005a9e;
     }
-    #taxirechner #results {
+    #results {
       margin-top: 20px;
       text-align: center;
     }
-    #taxirechner #map {
+    #map {
       height: 400px;
       margin-top: 20px;
       border-radius: 8px;
@@ -65,11 +65,12 @@
 
     /* --- Kontaktbereich --- */
     #contact-box {
+      display: none; /* Wird erst nach Berechnung sichtbar */
       background-color: #ffffff;
       border: 1px solid #ccc;
       border-radius: 10px;
       padding: 20px;
-      margin-top: 25px;
+      margin-top: 20px;
       box-shadow: 0 3px 6px rgba(0,0,0,0.08);
       text-align: center;
     }
@@ -77,6 +78,7 @@
       font-size: 0.95em;
       color: #333;
       margin-bottom: 15px;
+      line-height: 1.4;
     }
 
     .call-button {
@@ -96,7 +98,6 @@
       background-color: #005a9e;
     }
 
-    /* WhatsApp Button – jetzt in kräftigem WhatsApp-Grün */
     .whatsapp-button {
       background-color: #25D366;
       color: white;
@@ -113,7 +114,7 @@
       background-color: #1EBE5B;
     }
 
-    #taxirechner .footer {
+    .footer {
       text-align: center;
       margin-top: 30px;
       font-size: 0.8em;
@@ -163,24 +164,24 @@
     </div>
     <div class="form-group">
       <label for="dateTime">Datum und Uhrzeit:</label>
-      <input type="datetime-local" id="dateTime" placeholder="Optional:Datum und Uhrzeit eingeben">
+      <input type="datetime-local" id="dateTime">
     </div>
 
     <button onclick="calculateRoute()">Route und Preis berechnen</button>
     <div id="results"></div>
 
-    <div id="map"></div>
-
+    <!-- Kontaktbereich, nach Berechnung sichtbar -->
     <div id="contact-box">
       <p>
         Sie wissen jetzt, was Ihre Fahrt etwa kostet?<br>
-        Dann rufen Sie uns an oder bestellen Sie direkt über <b>WhatsApp</b> – einfach, schnell und ohne Wartezeit!<br>
-        <i>(Hinweis: Über WhatsApp ist nur eine Bestellung möglich, keine individuelle Anfrage.)</i>
+        Mit einem Klick auf <b>„Jetzt anrufen“</b> oder <b>„Per WhatsApp bestellen“</b> treten Sie direkt in Kontakt mit <b>Taxi Pfeiffer aus Blankenburg</b>.<br>
+        Über WhatsApp können Sie <b>nur eine Bestellung auslösen</b>, keine individuelle Anfrage stellen.
       </p>
-
       <button class="call-button" onclick="window.location.href='tel:03944353291'">📞 Jetzt anrufen</button>
       <button class="whatsapp-button" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">💬 Per WhatsApp bestellen</button>
     </div>
+
+    <div id="map"></div>
 
     <div class="footer">
       &copy; Taxi Pfeiffer, Blankenburg 2024
@@ -207,7 +208,6 @@
     function roundTo10Cents(value) {
       return Math.ceil(value * 10) / 10;
     }
-
     function roundToTenthKm(value) {
       return Math.ceil(value * 10) / 10;
     }
@@ -216,11 +216,14 @@
       const start = document.getElementById('start').value;
       const ziel = document.getElementById('ziel').value;
       const dateTime = document.getElementById('dateTime').value;
+      const contactBox = document.getElementById('contact-box');
 
       if (!start || !ziel || !dateTime) {
         alert("Bitte geben Sie Start-, Zieladresse und Datum/Uhrzeit ein!");
         return;
       }
+
+      contactBox.style.display = "none"; // sicherstellen, dass es beim Neuberechnen ausgeblendet ist
 
       try {
         const selectedDate = new Date(dateTime);
@@ -305,6 +308,16 @@
               inkl. der gesetzl. vorgeschriebenen Grundgebühr
             </span>
           </p>`;
+
+        // Kontaktbereich nach erfolgreicher Berechnung einblenden
+        contactBox.style.display = "block";
+
+        // Route auf Karte anzeigen
+        if (routeLayer) map.removeLayer(routeLayer);
+        const points = routeData.routes[0].legs[0].points.map(p => [p.latitude, p.longitude]);
+        routeLayer = L.polyline(points, { color: 'blue' }).addTo(map);
+        map.fitBounds(routeLayer.getBounds());
+
       } catch (error) {
         console.error(error);
         alert("Fehler bei der Berechnung. Bitte erneut versuchen.");
