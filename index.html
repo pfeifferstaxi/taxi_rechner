@@ -2,189 +2,389 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Taxirechner Landkreis Harz</title>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
   <style>
+    :root {
+      --primary-color: #005a9e;
+      --primary-hover: #00457a;
+      --whatsapp-color: #25D366;
+      --whatsapp-hover: #1EBE5B;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-main: #1c1e21;
+      --text-muted: #65676b;
+      --border-color: #dadce0;
+      --radius: 16px;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 15px;
+    }
+
     #taxirechner {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 20px auto;
-      padding: 20px;
-      max-width: 800px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: var(--card-bg);
+      margin: 0 auto;
+      padding: 25px;
+      max-width: 700px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
     #taxirechner h1 {
-      text-align: center;
-      color: #333;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      margin-bottom: 5px;
     }
-    #taxirechner .info, #taxirechner .tarife {
-      font-size: 0.9em;
-      color: #555;
+
+    .subheading {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .info, .tarife {
+      font-size: 0.9rem;
       margin: 20px 0;
-      padding: 10px;
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 15px;
+      border-radius: 12px;
     }
-    #taxirechner .info h2, #taxirechner .tarife h2 {
+
+    .info {
+      background-color: #fff3cd;
+      border: 1px solid #ffe69c;
+      color: #664d03;
+    }
+
+    .info h2 {
+      color: #997404;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .tarife {
+      background-color: #f8f9fa;
+      border: 1px solid var(--border-color);
+    }
+
+    .tarife h2 {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      margin-bottom: 12px;
       text-align: center;
-      color: #d9534f;
-      margin-bottom: 10px;
     }
-    #taxirechner input {
-      width: 100%;
-      padding: 8px;
+
+    .tarife ul {
+      list-style-type: none;
       margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
-    #taxirechner button {
-      width: 100%;
+
+    .tarife li {
+      padding: 6px 0;
+      border-bottom: 1px dashed #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tarife li:last-child {
+      border-bottom: none;
+    }
+
+    .anfahrt-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      background: #e9ecef;
       padding: 10px;
-      background-color: #0078d7;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #taxirechner button:hover {
-      background-color: #005a9e;
-    }
-    #results {
-      margin-top: 20px;
-      text-align: center;
-    }
-    #map {
-      height: 400px;
-      margin-top: 20px;
       border-radius: 8px;
     }
 
-    /* --- Kontaktbereich --- */
-    #contact-box {
-      display: none; /* Wird erst nach Berechnung sichtbar */
-      background-color: #ffffff;
-      border: 1px solid #ccc;
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px; 
+      border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      background-color: #fafafa;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(0, 90, 158, 0.15);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(0, 90, 158, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #results {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 12px;
+      background-color: #f8f9fa;
+      border: 1px solid var(--border-color);
+      display: none; 
+    }
+
+    #results h3 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    
+    .result-total {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid var(--border-color);
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #d9534f;
       text-align: center;
     }
+
+    .result-total span {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: normal;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    #map {
+      height: 350px;
+      margin-top: 25px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      z-index: 1;
+    }
+
+    /* --- Kontaktbereich & Routen-Auswahl --- */
+    #contact-box {
+      display: none;
+      background-color: #f0f7ff;
+      border: 1px solid #cce3ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .route-selector {
+      display: flex;
+      background: #e1ecf8;
+      border-radius: 10px;
+      padding: 5px;
+      margin-bottom: 20px;
+      gap: 5px;
+    }
+
+    .btn-route {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 5px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-route.active {
+      background: #ffffff;
+      color: var(--primary-color);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
     #contact-box p {
       font-size: 0.95em;
-      color: #333;
       margin-bottom: 15px;
-      line-height: 1.4;
+    }
+
+    .call-button, .whatsapp-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 12px;
+      transition: background-color 0.2s;
     }
 
     .call-button {
-      background-color: #0078d7;
+      background-color: var(--primary-color);
       color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 12px;
-      width: 100%;
-      font-size: 1em;
-      cursor: pointer;
-      margin-bottom: 10px;
-      font-weight: bold;
-      transition: 0.2s ease-in-out;
     }
+
     .call-button:hover {
-      background-color: #005a9e;
+      background-color: var(--primary-hover);
     }
 
     .whatsapp-button {
-      background-color: #25D366;
+      background-color: var(--whatsapp-color);
       color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 12px;
-      width: 100%;
-      font-size: 1em;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s ease-in-out;
+      margin-bottom: 0;
     }
+
     .whatsapp-button:hover {
-      background-color: #1EBE5B;
+      background-color: var(--whatsapp-hover);
     }
 
     .footer {
       text-align: center;
       margin-top: 30px;
-      font-size: 0.8em;
-      color: #888;
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 480px) {
+      #taxirechner {
+        padding: 15px;
+      }
+      .tarife li {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+      }
+      .btn-route {
+        font-size: 0.8rem;
+        padding: 10px 2px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="taxirechner">
-    <h1>Taxirechner Landkreis Harz</h1>
-    <div class="subheading" style="text-align:center;font-weight:bold;font-size:0.9em;">
-      Bereitgestellt von Taxi Pfeiffer Blankenburg
+    <div class="header-section">
+      <h1>Taxirechner für den Landkreis Harz</h1>
+      <div class="subheading">Bereitgestellt von Taxi Pfeiffer Blankenburg</div>
     </div>
 
     <div class="info">
-      <h2>Wichtiger Hinweis:</h2>
-      <p>
-        Die errechneten Kilometer und Preise sind nur ca.-Angaben, da die Endpreise aufgrund verschiedener äußerer Einflüsse variieren können. 
-        Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b>
-      </p>
+      <h2>⚠️ Wichtiger Hinweis</h2>
+      <p>Die errechneten Kilometer und Preise sind nur ca.-Angaben, da die Endpreise aufgrund verschiedener äußerer Einflüsse variieren können. Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b></p>
     </div>
 
     <div class="tarife">
       <h2>Tarifübersicht</h2>
       <ul>
-        <li><b>Grundgebühr: 4,20 €</b></li>
-        <li><b>Kilometer 1 - 5: 3,60 €/km</b></li>
-        <li><b>Kilometer 6 - 25: 2,60 €/km</b></li>
-        <li><b>Jeder weitere Kilometer: 2,40 €/km</b></li>
-        <li><b>Stand-/Wartezeit pro Stunde: 45,00 €</b></li>
-        <li><b>Nachtzuschlag (22.00 Uhr - 06.00 Uhr): 1,50 € auf die Grundgebühr</b></li>
+        <li><span>Grundgebühr</span> <b>4,20 €</b></li>
+        <li><span>Kilometer 1 - 5</span> <b>3,60 €/km</b></li>
+        <li><span>Kilometer 6 - 25</span> <b>2,60 €/km</b></li>
+        <li><span>Jeder weitere Kilometer</span> <b>2,40 €/km</b></li>
+        <li><span>Stand-/Wartezeit pro Stunde</span> <b>45,00 €</b></li>
+        <li><span>Nachtzuschlag (22 - 06 Uhr)</span> <b>+ 1,50 €</b></li>
       </ul>
-      <center><h2>Anfahrtspauschale:</h2></center>
-      <p>
-        Bei Fahrten, die nicht in Blankenburg beginnen und auch nicht in Blankenburg enden (z. B. ab Wernigerode nach Elbingerode), wird ein Entgelt nach Punkt 2 der Tarifordnung des Landkreises Harz fällig. 
-        Wir berechnen eine Gebühr von 1,50 €/km, gerechnet ab dem Betriebshof in der Westerhäuser Landstraße 17, 38889 Blankenburg.
-      </p>
+      
+      <div class="anfahrt-info">
+        <strong>Anfahrtspauschale:</strong> Bei Fahrten, die nicht in Blankenburg beginnen und enden, wird ein Entgelt nach Punkt 2 der Tarifordnung fällig. Wir berechnen 1,50 €/km ab dem Betriebshof (Westerhäuser Landstraße 17, Blankenburg).
+      </div>
     </div>
 
     <div class="form-group">
       <label for="start">Startadresse:</label>
-      <input type="text" id="start" placeholder="Startadresse eingeben" required>
+      <input type="text" id="start" placeholder="Wo soll es losgehen?" required>
     </div>
     <div class="form-group">
       <label for="ziel">Zieladresse:</label>
-      <input type="text" id="ziel" placeholder="Zieladresse eingeben" required>
+      <input type="text" id="ziel" placeholder="Wo möchten Sie hin?" required>
     </div>
     <div class="form-group">
       <label for="dateTime">Datum und Uhrzeit:</label>
       <input type="datetime-local" id="dateTime">
     </div>
 
-    <button onclick="calculateRoute()">Route und Preis berechnen</button>
+    <button class="btn-primary" onclick="calculateRoute()">Route & Preis berechnen</button>
+    
     <div id="results"></div>
 
-    <!-- Kontaktbereich, nach Berechnung sichtbar -->
     <div id="contact-box">
-      <p>
-        Sie wissen jetzt, was Ihre Fahrt etwa kostet?<br>
-        Mit einem Klick auf <b>„Jetzt anrufen“</b> oder <b>„Per WhatsApp bestellen“</b> treten Sie direkt in Kontakt mit <b>Taxi Pfeiffer aus Blankenburg</b>.<br>
-        Über WhatsApp können Sie <b>nur eine Bestellung auslösen</b>, keine individuelle Anfrage stellen.
-      </p>
-      <button class="call-button" onclick="window.location.href='tel:03944353291'">📞 Jetzt anrufen</button>
-      <button class="whatsapp-button" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">💬 Per WhatsApp bestellen</button>
+      <!-- NEU: Routen-Auswahl -->
+      <div class="route-selector" id="route-selector">
+        <button class="btn-route active" id="btn-fastest" onclick="calculateRoute('fastest')">Schnellste</button>
+        <button class="btn-route" id="btn-shortest" onclick="calculateRoute('shortest')">Kürzeste</button>
+        <button class="btn-route" id="btn-eco" onclick="calculateRoute('eco')">Sparsamste</button>
+      </div>
+
+      <p>Sie wissen jetzt, was Ihre Fahrt etwa kostet. <br>Buchen Sie Ihre Fahrt direkt bei <b>Taxi Pfeiffer</b>.</p>
+      <p style="font-size: 0.8rem; color: #555; margin-top:-10px; margin-bottom:15px;">(Über WhatsApp ist nur eine direkte Bestellung möglich, keine Vorab-Anfragen).</p>
+      
+      <button class="call-button" onclick="window.location.href='tel:03944353291'">
+        📞 Jetzt anrufen
+      </button>
+      <button class="whatsapp-button" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">
+        💬 Per WhatsApp bestellen
+      </button>
     </div>
 
     <div id="map"></div>
 
     <div class="footer">
-      &copy; Taxi Pfeiffer, Blankenburg 2024
+      &copy; 2024 Taxi Pfeiffer, Blankenburg
     </div>
   </div>
 
@@ -196,6 +396,13 @@
     }).addTo(map);
 
     let routeLayer;
+
+    // Variablen zum Zwischenspeichern der Koordinaten für den schnellen Routenwechsel
+    let cachedStartCoords = null;
+    let cachedZielCoords = null;
+    let lastStartInput = "";
+    let lastZielInput = "";
+    let currentRouteType = 'fastest';
 
     const baseFare = 4.20;
     const nightSurcharge = 1.50;
@@ -212,44 +419,68 @@
       return Math.ceil(value * 10) / 10;
     }
 
-    async function calculateRoute() {
-      const start = document.getElementById('start').value;
-      const ziel = document.getElementById('ziel').value;
+    async function calculateRoute(requestedType) {
+      // Bestimme den gewünschten Routentyp
+      const routeType = (typeof requestedType === 'string') ? requestedType : currentRouteType;
+      currentRouteType = routeType;
+
+      const start = document.getElementById('start').value.trim();
+      const ziel = document.getElementById('ziel').value.trim();
       const dateTime = document.getElementById('dateTime').value;
       const contactBox = document.getElementById('contact-box');
+      const resultsDiv = document.getElementById('results');
 
       if (!start || !ziel || !dateTime) {
-        alert("Bitte geben Sie Start-, Zieladresse und Datum/Uhrzeit ein!");
+        alert("Bitte gib Start-, Zieladresse und Datum/Uhrzeit ein!");
         return;
       }
 
-      contactBox.style.display = "none"; // sicherstellen, dass es beim Neuberechnen ausgeblendet ist
+      // Optische Anpassung der Buttons beim Klick
+      document.querySelectorAll('.btn-route').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('btn-' + routeType);
+      if (activeBtn) activeBtn.classList.add('active');
 
       try {
         const selectedDate = new Date(dateTime);
         const hour = selectedDate.getHours();
         const isNightTime = hour >= 22 || hour < 6;
-
         const betriebshofCoords = { lat: 51.800, lon: 10.950 };
 
-        const startResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(start)}.json?key=${tomtomApiKey}`);
-        const startData = await startResponse.json();
-        if (!startData.results || startData.results.length === 0) {
-          alert("Startadresse nicht gefunden!");
-          return;
-        }
-        const startCoords = startData.results[0].position;
+        let startCoords, zielCoords;
 
-        const zielResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(ziel)}.json?key=${tomtomApiKey}`);
-        const zielData = await zielResponse.json();
-        if (!zielData.results || zielData.results.length === 0) {
-          alert("Zieladresse nicht gefunden!");
-          return;
+        // Prüfen, ob wir die Koordinaten neu suchen müssen oder aus dem Cache laden können
+        if (start === lastStartInput && cachedStartCoords) {
+          startCoords = cachedStartCoords;
+        } else {
+          const startResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(start)}.json?key=${tomtomApiKey}`);
+          const startData = await startResponse.json();
+          if (!startData.results || startData.results.length === 0) {
+            alert("Startadresse nicht gefunden!");
+            return;
+          }
+          startCoords = startData.results[0].position;
+          cachedStartCoords = startCoords;
+          lastStartInput = start;
         }
-        const zielCoords = zielData.results[0].position;
 
-        const routeResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords.lat},${startCoords.lon}:${zielCoords.lat},${zielCoords.lon}/json?key=${tomtomApiKey}`);
+        if (ziel === lastZielInput && cachedZielCoords) {
+          zielCoords = cachedZielCoords;
+        } else {
+          const zielResponse = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(ziel)}.json?key=${tomtomApiKey}`);
+          const zielData = await zielResponse.json();
+          if (!zielData.results || zielData.results.length === 0) {
+            alert("Zieladresse nicht gefunden!");
+            return;
+          }
+          zielCoords = zielData.results[0].position;
+          cachedZielCoords = zielCoords;
+          lastZielInput = ziel;
+        }
+
+        // Hauptroute mit dem ausgewählten Routentyp (fastest, shortest, eco) berechnen
+        const routeResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${startCoords.lat},${startCoords.lon}:${zielCoords.lat},${zielCoords.lon}/json?key=${tomtomApiKey}&routeType=${routeType}`);
         const routeData = await routeResponse.json();
+        
         if (!routeData.routes || routeData.routes.length === 0) {
           alert("Keine Route gefunden!");
           return;
@@ -281,6 +512,8 @@
         let anfahrtspauschale = 0;
         let anfahrtKm = 0;
         if (!start.toLowerCase().includes("blankenburg") && !ziel.toLowerCase().includes("blankenburg")) {
+          // Die Anfahrtsroute belassen wir standardmäßig auf der schnellsten Route (default TomTom), 
+          // um die Kostenberechnung fair und vorhersehbar zu halten.
           const anfahrtResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${betriebshofCoords.lat},${betriebshofCoords.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
           const anfahrtData = await anfahrtResponse.json();
           if (anfahrtData.routes && anfahrtData.routes.length > 0) {
@@ -294,29 +527,31 @@
         totalFare = roundTo10Cents(totalFare);
         kmFare = roundTo10Cents(kmFare);
 
-        document.getElementById('results').innerHTML = `
-          <h3>Geschätzter Taxipreis</h3>
-          <p><b>Eingegebene Fahrstrecke:</b> ${start} → ${ziel}</p>
-          ${anfahrtKm > 0 ? `<p><b>Anfahrtskilometer:</b> ${anfahrtKm.toFixed(1)} km</p>` : ""}
-          ${anfahrtspauschale > 0 ? `<p><b>Anfahrtspauschale:</b> ${anfahrtspauschale.toFixed(2)} €</p>` : ""}
-          <p><b>Besetzte Kilometer:</b> ${distanceInKm.toFixed(1)} km</p>
-          <p><b>Preis besetzte Kilometer:</b> ${kmFare.toFixed(2)} €</p>
-          ${nightSurchargeApplied > 0 ? `<p><b>Nachtzuschlag:</b> ${nightSurchargeApplied.toFixed(2)} €</p>` : ""}
-          <p style="color:darkred;font-weight:bold;">
-            Geschätzter Taxipreis gesamt: ${totalFare.toFixed(2)} €<br>
-            <span style="font-weight:normal;font-size:0.9em;color:#444;">
-              inkl. der gesetzl. vorgeschriebenen Grundgebühr
-            </span>
-          </p>`;
+        // Bezeichnung der aktuellen Routenart für die Zusammenfassung
+        let routeTypeName = "Schnellste Route";
+        if(routeType === "shortest") routeTypeName = "Kürzeste Route";
+        if(routeType === "eco") routeTypeName = "Sparsamste Route";
 
-        // Kontaktbereich nach erfolgreicher Berechnung einblenden
+        resultsDiv.innerHTML = `
+          <h3>Zusammenfassung (${routeTypeName})</h3>
+          <div class="result-row"><span>Strecke:</span> <span><b>${distanceInKm.toFixed(1)} km</b></span></div>
+          <div class="result-row"><span>Fahrpreis:</span> <span>${kmFare.toFixed(2)} €</span></div>
+          ${anfahrtKm > 0 ? `<div class="result-row"><span>Anfahrt (${anfahrtKm.toFixed(1)} km):</span> <span>${anfahrtspauschale.toFixed(2)} €</span></div>` : ""}
+          ${nightSurchargeApplied > 0 ? `<div class="result-row"><span>Nachtzuschlag:</span> <span>${nightSurchargeApplied.toFixed(2)} €</span></div>` : ""}
+          
+          <div class="result-total">
+            Ca. ${totalFare.toFixed(2)} €
+            <span>inkl. ${baseFare.toFixed(2)} € Grundgebühr</span>
+          </div>
+        `;
+
+        resultsDiv.style.display = "block";
         contactBox.style.display = "block";
 
-        // Route auf Karte anzeigen
         if (routeLayer) map.removeLayer(routeLayer);
         const points = routeData.routes[0].legs[0].points.map(p => [p.latitude, p.longitude]);
-        routeLayer = L.polyline(points, { color: 'blue' }).addTo(map);
-        map.fitBounds(routeLayer.getBounds());
+        routeLayer = L.polyline(points, { color: '#005a9e', weight: 5 }).addTo(map);
+        map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] });
 
       } catch (error) {
         console.error(error);
