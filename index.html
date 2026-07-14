@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Taxirechner Landkreis Harz</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#005a9e">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -63,9 +69,43 @@
       font-weight: 500;
     }
 
+    /* Neu: Toggle Button für Rechtliches & Tarife */
+    .btn-toggle-info {
+      width: 100%;
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-toggle-info:hover, .btn-toggle-info:active {
+      background-color: #e1ecf8;
+    }
+
+    #rechtliches-container {
+      display: none; /* Standardmäßig versteckt */
+      margin-bottom: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .info, .tarife {
       font-size: 0.9rem;
-      margin: 20px 0;
+      margin: 0 0 15px 0;
       padding: 15px;
       border-radius: 12px;
     }
@@ -324,24 +364,30 @@
       <div class="subheading">Bereitgestellt von Taxi Pfeiffer Blankenburg</div>
     </div>
 
-    <div class="info">
-      <h2>⚠️ Wichtiger Hinweis</h2>
-      <p>Die errechneten Kilometer und Preise sind nur ca.-Angaben, da die Endpreise aufgrund verschiedener äußerer Einflüsse variieren können. Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b></p>
-    </div>
+    <button class="btn-toggle-info" id="btn-toggle-info" onclick="toggleRechtliches()">
+      <span>Rechtliches & Tarife anzeigen</span> <span>🔽</span>
+    </button>
 
-    <div class="tarife">
-      <h2>Tarifübersicht</h2>
-      <ul>
-        <li><span>Grundgebühr</span> <b>4,20 €</b></li>
-        <li><span>Kilometer 1 - 5</span> <b>3,60 €/km</b></li>
-        <li><span>Kilometer 6 - 25</span> <b>2,60 €/km</b></li>
-        <li><span>Jeder weitere Kilometer</span> <b>2,40 €/km</b></li>
-        <li><span>Stand-/Wartezeit pro Stunde</span> <b>45,00 €</b></li>
-        <li><span>Nachtzuschlag (22 - 06 Uhr)</span> <b>+ 1,50 €</b></li>
-      </ul>
-      
-      <div class="anfahrt-info">
-        <strong>Anfahrtspauschale:</strong> Bei Fahrten, die nicht in Blankenburg beginnen und enden, wird ein Entgelt nach Punkt 2 der Tarifordnung fällig. Wir berechnen 1,50 €/km ab dem Betriebshof (Westerhäuser Landstraße 17, Blankenburg).
+    <div id="rechtliches-container">
+      <div class="info">
+        <h2>⚠️ Wichtiger Hinweis</h2>
+        <p>Die errechneten Kilometer und Preise sind nur ca.-Angaben, da die Endpreise aufgrund verschiedener äußerer Einflüsse variieren können. Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b></p>
+      </div>
+
+      <div class="tarife">
+        <h2>Tarifübersicht</h2>
+        <ul>
+          <li><span>Grundgebühr</span> <b>4,20 €</b></li>
+          <li><span>Kilometer 1 - 5</span> <b>3,60 €/km</b></li>
+          <li><span>Kilometer 6 - 25</span> <b>2,60 €/km</b></li>
+          <li><span>Jeder weitere Kilometer</span> <b>2,40 €/km</b></li>
+          <li><span>Stand-/Wartezeit pro Stunde</span> <b>45,00 €</b></li>
+          <li><span>Nachtzuschlag (22 - 06 Uhr)</span> <b>+ 1,50 €</b></li>
+        </ul>
+        
+        <div class="anfahrt-info">
+          <strong>Anfahrtspauschale:</strong> Bei Fahrten, die nicht in Blankenburg beginnen und enden, wird ein Entgelt nach Punkt 2 der Tarifordnung fällig. Wir berechnen 1,50 €/km ab dem Betriebshof (Westerhäuser Landstraße 17, Blankenburg).
+        </div>
       </div>
     </div>
 
@@ -363,7 +409,7 @@
     <div id="results"></div>
 
     <div id="contact-box">
-      <!-- NEU: Routen-Auswahl -->
+      <!-- Routen-Auswahl -->
       <div class="route-selector" id="route-selector">
         <button class="btn-route active" id="btn-fastest" onclick="calculateRoute('fastest')">Schnellste</button>
         <button class="btn-route" id="btn-shortest" onclick="calculateRoute('shortest')">Kürzeste</button>
@@ -389,6 +435,29 @@
   </div>
 
   <script>
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker registriert!', reg))
+          .catch(err => console.error('ServiceWorker Fehler:', err));
+      });
+    }
+
+    // Toggle Funktion für Rechtliches und Tarife
+    function toggleRechtliches() {
+      const container = document.getElementById('rechtliches-container');
+      const btn = document.getElementById('btn-toggle-info');
+      
+      if (container.style.display === "none" || container.style.display === "") {
+        container.style.display = "block";
+        btn.innerHTML = "<span>Rechtliches & Tarife ausblenden</span> <span>🔼</span>";
+      } else {
+        container.style.display = "none";
+        btn.innerHTML = "<span>Rechtliches & Tarife anzeigen</span> <span>🔽</span>";
+      }
+    }
+
     const tomtomApiKey = "A2lRfHWgDIYXh9QObZJTvb17TdUG3CNn";
     const map = L.map('map').setView([51.833, 10.790], 12);
     L.tileLayer(`https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=${tomtomApiKey}`, {
@@ -512,8 +581,6 @@
         let anfahrtspauschale = 0;
         let anfahrtKm = 0;
         if (!start.toLowerCase().includes("blankenburg") && !ziel.toLowerCase().includes("blankenburg")) {
-          // Die Anfahrtsroute belassen wir standardmäßig auf der schnellsten Route (default TomTom), 
-          // um die Kostenberechnung fair und vorhersehbar zu halten.
           const anfahrtResponse = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${betriebshofCoords.lat},${betriebshofCoords.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
           const anfahrtData = await anfahrtResponse.json();
           if (anfahrtData.routes && anfahrtData.routes.length > 0) {
