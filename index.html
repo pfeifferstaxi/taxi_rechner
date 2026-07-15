@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Taxirechner Landkreis Harz</title>
   
-  <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#005a9e">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -63,10 +62,10 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
+      background-color: var(--card-bg); /* Hintergrundfarbe der App anpassen */
       color: var(--text-main);
       line-height: 1.6;
-      padding: 15px;
+      padding: 0; /* Padding entfernt, damit die App bis zum Rand geht auf Mobilgeräten */
       user-select: none; 
     }
 
@@ -77,10 +76,27 @@
     #taxirechner {
       background-color: var(--card-bg);
       margin: 0 auto;
-      padding: 25px;
-      max-width: 700px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      padding: 20px 15px; /* Innenabstand, damit Texte nicht am Rand kleben */
+      max-width: 100%; /* Volle Breite nutzen */
+      min-height: 100vh; /* Mindestens die gesamte Bildschirmhöhe füllen */
+      border-radius: 0; /* Keine runden Ecken auf dem Smartphone */
+      box-shadow: none; /* Kein Schatten auf dem Smartphone */
+    }
+
+    /* --- Desktop & Tablet Ansicht (Media Query) --- */
+    /* Auf größeren Bildschirmen wird die App wieder als schicke Karte zentriert */
+    @media (min-width: 768px) {
+      body {
+        padding: 20px;
+        background-color: var(--bg-color); /* Grauer/Dunkler Hintergrund um die Karte */
+      }
+      #taxirechner {
+        max-width: 700px;
+        min-height: auto;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 30px;
+      }
     }
 
     .header-section { text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
@@ -209,7 +225,6 @@
       </div>
     </div>
 
-    <!-- Quick Select Area (Nur Historie) -->
     <div class="quick-select-container">
       <div class="quick-select-title" id="history-title" style="display:none;">🕒 Letzte Fahrten</div>
       <div class="pills" id="history-pills"></div>
