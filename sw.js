@@ -1,31 +1,30 @@
-const CACHE_NAME = 'taxi-rechner-v1';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'taxi-harz-v1'; // Ändere die Versionsnummer (v2, v3...), wenn du den Code aktualisierst
+const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'
 ];
 
-// Install Event
-self.addEventListener('install', event => {
+// Installation: Cache alle wichtigen Assets
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
   );
+  self.skipWaiting();
 });
 
-// Activate Event (Cleanup old caches)
-self.addEventListener('activate', event => {
+// Aktivierung: Lösche alte Caches, wenn die Version gewechselt hat
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
           }
         })
       );
@@ -33,23 +32,11 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch Event
-self.addEventListener('fetch', event => {
-  // FÃ¼r API-Aufrufe (TomTom) nutzen wir Netzwerk zuerst
-  if (event.request.url.includes('api.tomtom.com')) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-  } else {
-    // FÃ¼r statische Dateien Cache zuerst, dann Netzwerk
-    event.respondWith(
-      caches.match(event.request)
-        .then(response => {
-          if (response) {
-            return response;
-          }
-          return fetch(event.request);
-        })
-    );
-  }
+// Fetch: Lade aus dem Cache, wenn offline, sonst vom Netz
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
 });
