@@ -32,7 +32,7 @@
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
-    /* Dunkelmodus (wird automatisch aktiviert, wenn das System auf Dark Mode steht) */
+    /* Dunkelmodus */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-color: #121212;
@@ -50,22 +50,23 @@
       .btn-toggle-info { color: var(--primary-color) !important; border-color: var(--primary-color) !important; }
       .btn-toggle-info:hover, .route-selector { background-color: #333 !important; }
       .btn-route.active { background: #444 !important; color: var(--primary-color) !important; }
+      .info-button { background-color: #333 !important; color: #fff !important; }
+      .info-button:hover { background-color: #444 !important; }
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      /* App-Feeling: Textmarkierung verhindern (außer in Eingabefeldern) */
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--card-bg); /* Hintergrundfarbe der App anpassen */
+      background-color: var(--card-bg);
       color: var(--text-main);
       line-height: 1.6;
-      padding: 0; /* Padding entfernt, damit die App bis zum Rand geht auf Mobilgeräten */
+      padding: 0; 
       user-select: none; 
     }
 
@@ -76,19 +77,17 @@
     #taxirechner {
       background-color: var(--card-bg);
       margin: 0 auto;
-      padding: 20px 15px; /* Innenabstand, damit Texte nicht am Rand kleben */
-      max-width: 100%; /* Volle Breite nutzen */
-      min-height: 100vh; /* Mindestens die gesamte Bildschirmhöhe füllen */
-      border-radius: 0; /* Keine runden Ecken auf dem Smartphone */
-      box-shadow: none; /* Kein Schatten auf dem Smartphone */
+      padding: 20px 15px; 
+      max-width: 100%; 
+      min-height: 100vh; 
+      border-radius: 0; 
+      box-shadow: none; 
     }
 
-    /* --- Desktop & Tablet Ansicht (Media Query) --- */
-    /* Auf größeren Bildschirmen wird die App wieder als schicke Karte zentriert */
     @media (min-width: 768px) {
       body {
         padding: 20px;
-        background-color: var(--bg-color); /* Grauer/Dunkler Hintergrund um die Karte */
+        background-color: var(--bg-color); 
       }
       #taxirechner {
         max-width: 700px;
@@ -103,7 +102,6 @@
     #taxirechner h1 { color: var(--primary-color); font-size: 1.5rem; margin-bottom: 5px; }
     .subheading { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
 
-    /* Buttons & Formulare */
     .btn-toggle-info {
       width: 100%; background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color);
       padding: 12px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-bottom: 20px;
@@ -115,9 +113,8 @@
     .tarife { background-color: #f8f9fa; border: 1px solid var(--border-color); }
     .tarife li { padding: 6px 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; }
     .tarife li:last-child { border-bottom: none; }
-    .anfahrt-info { font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; background: var(--input-bg); padding: 10px; border-radius: 8px; }
+    .anfahrt-info { font-size: 0.85rem; color: var(--text-muted); margin-top: 15px; background: var(--input-bg); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary-color); }
 
-    /* Eingabefelder mit GPS & Autocomplete */
     .form-group { margin-bottom: 15px; position: relative; }
     .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
     .input-wrapper { display: flex; gap: 8px; position: relative; }
@@ -140,7 +137,6 @@
     }
     .autocomplete-items div:hover { background-color: var(--primary-color); color: #fff; }
 
-    /* Historie (Pills) */
     .quick-select-container { margin-bottom: 20px; }
     .quick-select-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
     .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
@@ -155,7 +151,6 @@
       border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
     }
 
-    /* Loader */
     .loader-container { display: none; text-align: center; margin: 20px 0; }
     .loader {
       border: 4px solid var(--border-color); border-top: 4px solid var(--primary-color);
@@ -163,7 +158,6 @@
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Preisübersicht */
     #results { margin-top: 25px; padding: 20px; border-radius: 12px; background-color: var(--input-bg); border: 1px solid var(--border-color); display: none; }
     #results h3 { text-align: center; color: var(--primary-color); margin-bottom: 15px; font-size: 1.2rem; }
     .price-grid { display: grid; gap: 10px; margin-bottom: 15px; }
@@ -176,7 +170,6 @@
     .result-total-box .price { font-size: 1.8rem; font-weight: bold; color: var(--primary-color); display: block; }
     .result-total-box .hint { font-size: 0.8rem; color: var(--text-muted); }
 
-    /* Routen-Auswahl & Kontakt */
     #contact-box { display: none; margin-top: 25px; text-align: center; padding: 20px; background-color: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color); }
     .route-selector { display: flex; background: var(--border-color); border-radius: 10px; padding: 5px; margin-bottom: 20px; gap: 5px; }
     .btn-route { flex: 1; border: none; background: transparent; padding: 12px 5px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: var(--text-main); cursor: pointer; }
@@ -188,6 +181,27 @@
     }
     .call-button { background-color: var(--primary-color); color: white; }
     .whatsapp-button { background-color: var(--whatsapp-color); color: white; margin-bottom: 0; }
+    
+    .info-button {
+      background-color: #e4e6eb; color: var(--text-main); border: none; border-radius: 10px; width: 50px;
+      font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .info-button:hover { background-color: #d8dadf; }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-content {
+      background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 400px; width: 100%;
+      box-shadow: var(--shadow); position: relative; text-align: left;
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 15px; background: none; border: none;
+      font-size: 1.5rem; cursor: pointer; color: var(--text-muted); line-height: 1;
+    }
+    .modal-content p { margin-bottom: 20px; color: var(--text-main); font-size: 0.95rem; line-height: 1.5; }
 
     #map { height: 350px; margin-top: 25px; border-radius: 12px; border: 1px solid var(--border-color); z-index: 1; }
     .footer { text-align: center; margin-top: 30px; font-size: 0.85em; color: var(--text-muted); }
@@ -200,7 +214,7 @@
       <div class="subheading">Bereitgestellt von Taxi Pfeiffer Blankenburg</div>
     </div>
 
-    <button class="btn-toggle-info" id="btn-toggle-info" onclick="toggleRechtliches()">
+    <button type="button" class="btn-toggle-info" id="btn-toggle-info" onclick="toggleRechtliches()">
       <span>Rechtliches & Tarife anzeigen</span> <span>🔽</span>
     </button>
 
@@ -210,17 +224,19 @@
         <p>Die errechneten Kilometer und Preise sind nur ca.-Angaben. Bindend ist letztendlich der Preis des Taxameters. Für die Berechnung übernehmen wir <b>keine Gewährleistung!</b></p>
       </div>
       <div class="tarife">
-        <h2>Tarifübersicht</h2>
+        <h2>Tarifübersicht (bis zu 4 Personen)</h2>
         <ul>
-          <li><span>Grundgebühr</span> <b>4,20 €</b></li>
-          <li><span>Kilometer 1 - 5</span> <b>3,60 €/km</b></li>
-          <li><span>Kilometer 6 - 25</span> <b>2,60 €/km</b></li>
-          <li><span>Jeder weitere km</span> <b>2,40 €/km</b></li>
-          <li><span>Wartezeit pro Stunde</span> <b>45,00 €</b></li>
-          <li><span>Nachtzuschlag (22 - 06 Uhr)</span> <b>+ 1,50 €</b></li>
+          <li><span>Grundgebühr</span> <b>4,70 €</b></li>
+          <li><span>Kilometer 1 - 5</span> <b>3,90 €/km</b></li>
+          <li><span>Kilometer 6 - 25</span> <b>2,90 €/km</b></li>
+          <li><span>Ab dem 26. Kilometer</span> <b>2,70 €/km</b></li>
+          <li><span>Wartezeit pro Stunde</span> <b>50,00 €</b></li>
+          <li><span>Zuschlag Wochentags (22-06 Uhr) & So./Feiertags <br><small>auf Grundgebühr</small></span> <b style="text-align: right;">+ 1,00 €</b></li>
+          <li><span>Zuschlag Wochentags (22-06 Uhr) & So./Feiertags <br><small>auf Kilometer</small></span> <b style="text-align: right;">+ 0,20 €/km</b></li>
         </ul>
         <div class="anfahrt-info">
-          <strong>Anfahrtspauschale:</strong> 1,50 €/km ab Betriebshof, falls Start & Ziel außerhalb von Blankenburg liegen.
+          <strong>Anfahrt zum Besteller:</strong><br>
+          Sind weder die Einstiegsstelle noch das Beförderungsziel der Standort (§ 13 Abs. 3) der Taxe (Betriebshof), ist für die Anfahrt zum Besteller ein Entgelt nach dem Kilometertarif zu erheben. Die Anfahrt beginnt mit dem Passieren der Ortstafel des Standortes. Hierauf ist der Fahrgast bereits bei der Bestellung hinzuweisen.
         </div>
       </div>
     </div>
@@ -234,7 +250,8 @@
       <label for="start">Startadresse:</label>
       <div class="input-wrapper">
         <input type="text" id="start" placeholder="Wo soll es losgehen?" autocomplete="off" required>
-        <button class="btn-gps" onclick="getGPSLocation()" title="Mein Standort">📍</button>
+        <!-- type="button" hinzugefügt, damit hier kein unsichtbares Formular-Submit ausgelöst wird -->
+        <button type="button" class="btn-gps" onclick="getGPSLocation()" title="Mein Standort">📍</button>
       </div>
     </div>
     
@@ -248,7 +265,8 @@
       <input type="datetime-local" id="dateTime">
     </div>
 
-    <button class="btn-primary" onclick="calculateRoute()">Route & Preis berechnen</button>
+    <!-- Auch hier zur Sicherheit type="button" hinzugefügt -->
+    <button type="button" class="btn-primary" onclick="calculateRoute()">Route & Preis berechnen</button>
     
     <div class="loader-container" id="loader"><div class="loader"></div><p style="margin-top:10px; font-size:0.9rem; color:var(--text-muted);">Route wird berechnet...</p></div>
     
@@ -256,21 +274,35 @@
 
     <div id="contact-box">
       <div class="route-selector" id="route-selector">
-        <button class="btn-route active" id="btn-fastest" onclick="calculateRoute('fastest')">Schnellste</button>
-        <button class="btn-route" id="btn-shortest" onclick="calculateRoute('shortest')">Kürzeste</button>
-        <button class="btn-route" id="btn-eco" onclick="calculateRoute('eco')">Sparsamste</button>
+        <button type="button" class="btn-route active" id="btn-fastest" onclick="calculateRoute('fastest')">Schnellste</button>
+        <button type="button" class="btn-route" id="btn-shortest" onclick="calculateRoute('shortest')">Kürzeste</button>
+        <button type="button" class="btn-route" id="btn-eco" onclick="calculateRoute('eco')">Sparsamste</button>
       </div>
-      <p>Buchen Sie Ihre Fahrt direkt bei <b>Taxi Pfeiffer</b>.</p>
-      <button class="call-button" onclick="window.location.href='tel:03944353291'">📞 Jetzt anrufen</button>
-      <button class="whatsapp-button" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">💬 Per WhatsApp bestellen</button>
+      <p style="margin-bottom: 12px;">Buchen Sie Ihre Fahrt direkt bei <b>Taxi Pfeiffer</b>.</p>
+      <button type="button" class="call-button" onclick="window.location.href='tel:03944353291'">📞 Jetzt anrufen</button>
+      
+      <div style="display: flex; gap: 10px; width: 100%; margin-bottom: 12px;">
+        <button type="button" class="whatsapp-button" style="flex: 1;" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">💬 Per WhatsApp bestellen</button>
+        <button type="button" class="info-button" onclick="openWaModal()" title="Info zur WhatsApp-Bestellung">ℹ️</button>
+      </div>
     </div>
 
     <div id="map"></div>
     <div class="footer">&copy; 2026 Taxi Pfeiffer, Blankenburg</div>
   </div>
 
+  <!-- WhatsApp Info Modal -->
+  <div class="modal-overlay" id="waModal" onclick="closeWaModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button type="button" class="modal-close" onclick="closeWaModal()">&times;</button>
+      <h3 style="margin-bottom: 15px; color: var(--whatsapp-color);">WhatsApp Bestellung</h3>
+      <p>Mit Klick auf den WhatsApp-Button gelangen Sie in unser WhatsApp-Bestellsystem. Dort steht nach dem Öffnen <b>"Hallo"</b>.</p>
+      <p>Das einfach abschicken und den folgenden Anweisungen folgen.</p>
+      <button type="button" class="btn-primary" style="background-color: var(--whatsapp-color);" onclick="window.location.href='https://wa.me/4939443687740?text=Hallo'">Verstanden & Weiter</button>
+    </div>
+  </div>
+
   <script>
-    // --- 1. Grundeinstellungen & PWA ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.error(err));
@@ -283,12 +315,10 @@
     let cachedStartCoords = null, cachedZielCoords = null;
     let lastStartInput = "", lastZielInput = "";
 
-    // Datum vorbelegen auf "jetzt"
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('dateTime').value = now.toISOString().slice(0,16);
 
-    // --- 2. Map Initialisierung ---
     const map = L.map('map').setView([51.833, 10.790], 12);
     L.tileLayer(`https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=${tomtomApiKey}`, { attribution: '© TomTom' }).addTo(map);
 
@@ -304,7 +334,9 @@
       }
     }
 
-    // --- 3. Autocomplete Funktion (TomTom) ---
+    function openWaModal() { document.getElementById('waModal').style.display = 'flex'; }
+    function closeWaModal(e) { document.getElementById('waModal').style.display = 'none'; }
+
     function setupAutocomplete(inp) {
       let currentFocus;
       inp.addEventListener("input", async function(e) {
@@ -347,31 +379,52 @@
     setupAutocomplete(document.getElementById("start"));
     setupAutocomplete(document.getElementById("ziel"));
 
-    // --- 4. GPS Funktion ---
+    // --- ÜBERARBEITETE STANDORTBESTIMMUNG ---
     async function getGPSLocation() {
       const startInput = document.getElementById('start');
       startInput.value = "Standort wird ermittelt...";
+      
       if (navigator.geolocation) {
+        // Optionen hinzugefügt, damit sich die Abfrage auf Smartphones nicht endlos aufhängt
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 10000, // Maximal 10 Sekunden warten
+          maximumAge: 0
+        };
+
         navigator.geolocation.getCurrentPosition(async (position) => {
           try {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             const res = await fetch(`https://api.tomtom.com/search/2/reverseGeocode/${lat},${lon}.json?key=${tomtomApiKey}`);
             const data = await res.json();
+            
             if(data.addresses && data.addresses.length > 0) {
               startInput.value = data.addresses[0].address.freeformAddress;
               cachedStartCoords = { lat: lat, lon: lon };
               lastStartInput = startInput.value;
-            } else { startInput.value = ""; alert("Adresse konnte nicht ermittelt werden."); }
-          } catch(err) { startInput.value = ""; alert("Fehler bei der Adressauflösung."); }
+            } else { 
+              startInput.value = ""; 
+              alert("Adresse konnte nicht genau ermittelt werden. Bitte manuell eingeben."); 
+            }
+          } catch(err) { 
+            startInput.value = ""; 
+            alert("Fehler bei der Adressauflösung über den Server."); 
+          }
         }, (error) => {
           startInput.value = "";
-          alert("GPS Zugriff verweigert oder nicht verfügbar.");
-        });
-      } else { alert("GPS wird von diesem Browser nicht unterstützt."); }
+          let errorMessage = "GPS Fehler.";
+          if (error.code === 1) errorMessage = "GPS Zugriff verweigert! Bitte erteile deinem Browser die Berechtigung zur Standortabfrage.";
+          if (error.code === 2) errorMessage = "Dein Standort ist momentan nicht verfügbar (kein GPS Signal).";
+          if (error.code === 3) errorMessage = "Zeitüberschreitung. Dein Gerät braucht zu lange, um den Standort zu finden.";
+          alert(errorMessage);
+        }, options);
+      } else { 
+        startInput.value = "";
+        alert("GPS wird von diesem Browser leider nicht unterstützt."); 
+      }
     }
 
-    // --- 5. Historie ---
     function loadHistory() {
       const history = JSON.parse(localStorage.getItem('taxi_history')) || [];
       const container = document.getElementById('history-pills');
@@ -397,17 +450,34 @@
     function saveToHistory(start, ziel) {
       let history = JSON.parse(localStorage.getItem('taxi_history')) || [];
       const newRoute = { start, ziel };
-      // Verhindere exakte Duplikate
       if(!history.find(h => h.start === start && h.ziel === ziel)) {
         history.unshift(newRoute);
-        if(history.length > 3) history.pop(); // Nur letzte 3 speichern
+        if(history.length > 3) history.pop();
         localStorage.setItem('taxi_history', JSON.stringify(history));
         loadHistory();
       }
     }
     loadHistory();
 
-    // --- 6. Routenberechnung ---
+    function calculateTieredFare(distance) {
+      let fare = 0;
+      let remainingDistance = distance;
+      const rates = [
+        { limit: 5, rate: 3.90 }, 
+        { limit: 20, rate: 2.90 }, 
+        { limit: Infinity, rate: 2.70 }
+      ];
+      
+      for (const tier of rates) {
+        if (remainingDistance > 0) {
+          let d = Math.min(remainingDistance, tier.limit);
+          fare += d * tier.rate;
+          remainingDistance -= d;
+        }
+      }
+      return fare;
+    }
+
     async function calculateRoute(requestedType) {
       const routeType = (typeof requestedType === 'string') ? requestedType : currentRouteType;
       currentRouteType = routeType;
@@ -424,14 +494,18 @@
       document.querySelectorAll('.btn-route').forEach(btn => btn.classList.remove('active'));
       if(document.getElementById('btn-' + routeType)) document.getElementById('btn-' + routeType).classList.add('active');
 
-      // Loader anzeigen, Ergebnisse verstecken
       resultsDiv.style.display = "none";
       contactBox.style.display = "none";
       loader.style.display = "block";
 
       try {
         const selectedDate = new Date(dateTime);
-        const isNightTime = selectedDate.getHours() >= 22 || selectedDate.getHours() < 6;
+        const hour = selectedDate.getHours();
+        const day = selectedDate.getDay();
+        
+        const isNightTime = hour >= 22 || hour < 6;
+        const isSurchargeTime = isNightTime || day === 0; 
+        
         const betriebshof = { lat: 51.800, lon: 10.950 };
         let startCoords, zielCoords;
 
@@ -459,47 +533,52 @@
 
         const distanceKm = Math.ceil((routeData.routes[0].summary.lengthInMeters / 1000) * 10) / 10;
         
-        let totalFare = 4.20; // Grundgebühr
-        let remDist = distanceKm, kmFare = 0;
-        const rates = [{ m: 5, r: 3.60 }, { m: 25, r: 2.60 }, { m: Infinity, r: 2.40 }];
-        
-        for (const tier of rates) {
-          if (remDist > 0) {
-            let d = Math.min(remDist, tier.m);
-            kmFare += d * tier.r;
-            remDist -= d;
-          }
-        }
-        totalFare += kmFare;
-
-        let nightCharge = isNightTime ? 1.50 : 0;
-        totalFare += nightCharge;
-
-        let anfahrtKm = 0, anfahrtPreis = 0;
+        let anfahrtKm = 0;
         if (!start.toLowerCase().includes("blankenburg") && !ziel.toLowerCase().includes("blankenburg")) {
           const aRes = await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${betriebshof.lat},${betriebshof.lon}:${startCoords.lat},${startCoords.lon}/json?key=${tomtomApiKey}`);
           const aData = await aRes.json();
           if (aData.routes) {
             anfahrtKm = Math.ceil((aData.routes[0].summary.lengthInMeters / 1000) * 10) / 10;
-            anfahrtPreis = Math.ceil((anfahrtKm * 1.50) * 10) / 10;
-            totalFare += anfahrtPreis;
           }
         }
 
-        // Layout für neue Kachel
+        let baseFare = 4.70;
+        let totalDistance = anfahrtKm + distanceKm;
+        
+        let totalKmFare = calculateTieredFare(totalDistance);
+        let anfahrtPreisDisplay = calculateTieredFare(anfahrtKm);
+        let fahrtPreisDisplay = totalKmFare - anfahrtPreisDisplay;
+
+        let surchargeBase = isSurchargeTime ? 1.00 : 0;
+        let surchargeKm = isSurchargeTime ? (totalDistance * 0.20) : 0;
+        let totalSurcharge = surchargeBase + surchargeKm;
+
+        let totalFare = baseFare + totalKmFare + totalSurcharge;
+
         let routeName = routeType === 'shortest' ? "Kürzeste" : (routeType === 'eco' ? "Sparsamste" : "Schnellste");
         
+        let htmlLines = `
+          <div class="price-row" style="color:var(--text-muted); font-size:0.85rem;"><span>Grundgebühr</span> <span>${baseFare.toFixed(2)} €</span></div>
+        `;
+        
+        if (anfahrtKm > 0) {
+          htmlLines += `<div class="price-row"><span>Anfahrt (${anfahrtKm.toFixed(1)} km)</span> <span>${anfahrtPreisDisplay.toFixed(2)} €</span></div>`;
+        }
+        
+        htmlLines += `<div class="price-row"><span>Strecke (${distanceKm.toFixed(1)} km)</span> <span>${fahrtPreisDisplay.toFixed(2)} €</span></div>`;
+        
+        if (totalSurcharge > 0) {
+          htmlLines += `<div class="price-row"><span>Nacht-/Feiertagszuschlag</span> <span>${totalSurcharge.toFixed(2)} €</span></div>`;
+        }
+
         resultsDiv.innerHTML = `
           <h3>Fahrtübersicht (${routeName})</h3>
           <div class="price-grid">
-            <div class="price-row"><span>Strecke (${distanceKm.toFixed(1)} km)</span> <span>${kmFare.toFixed(2)} €</span></div>
-            ${anfahrtKm > 0 ? `<div class="price-row"><span>Anfahrt (${anfahrtKm.toFixed(1)} km)</span> <span>${anfahrtPreis.toFixed(2)} €</span></div>` : ""}
-            ${nightCharge > 0 ? `<div class="price-row"><span>Nachtzuschlag</span> <span>${nightCharge.toFixed(2)} €</span></div>` : ""}
-            <div class="price-row" style="color:var(--text-muted); font-size:0.85rem;"><span>Grundgebühr</span> <span>4.20 €</span></div>
+            ${htmlLines}
           </div>
           <div class="result-total-box">
             <span class="price">Ca. ${totalFare.toFixed(2)} €</span>
-            <span class="hint">Geschätzter Fahrpreis laut aktuellem Tarif</span>
+            <span class="hint">Geschätzter Fahrpreis (ohne Stand-/Wartezeiten)</span>
           </div>
         `;
 
